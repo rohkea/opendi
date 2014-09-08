@@ -28,7 +28,7 @@ typedef struct _AlphabetData {
 } AlphabetData;
 
 typedef struct _AlphabeticString {
-	int entryLength;
+	int stringLength;
 	unsigned short int *text;
 } AlphabeticString;
 

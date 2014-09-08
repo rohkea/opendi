@@ -21,7 +21,7 @@ AlphabetEntry tmp_alphabet_entries_1[] = {
 	{1, L"q", 2},
 	{1, L"r", 2},
 	{1, L"s", 2},
-	{1, L"t", 2},
+	{1, L"ß", 2},
 	{1, L"u", 1},
 	{1, L"v", 2},
 	{1, L"w", 2},
@@ -29,6 +29,8 @@ AlphabetEntry tmp_alphabet_entries_1[] = {
 	{1, L"y", 1},
 	{1, L"z", 2}
 };
+
+AlphabetData tmp_alphabet_data_1 = {26, tmp_alphabet_entries_1};
 
 
 AlphabetEntry tmp_alphabet_entries_2[] = {
@@ -60,12 +62,71 @@ DictionaryData tmp_dicts[] = {
 
 const TCHAR className[] = TEXT("Thesaurorum verborum...");
 
-void alphFreeString(AlphabeticString *s) {
-	
+void alphFreeAString(AlphabeticString *s) {
+	if (s != NULL) {
+		if (s->text != NULL) {
+			free(s->text);
+		}
+		free(s);
+	}
 }
 
-AlphabeticString *alphTo() {
-
+/* returned string should be freed with alphFreeAString */
+AlphabeticString *alphToAString(AlphabetData *ad, wchar_t *s) {
+	unsigned short int *res;
+	AlphabeticString *as;
+	int allocated, current;
+	int from, to, centre, comparisonResult;
+	
+	allocated = 16;
+	res = malloc(allocated * sizeof(unsigned short int));
+	current = 0;	
+	
+	while (*s) {
+		from = 0;
+		to = ad->numEntries;
+		while (from < to - 1) {
+			centre = (from + to) / 2;
+			comparisonResult = wcsncmp(s,
+					ad->entries[centre].text,
+					ad->entries[centre].entryLength);
+			if (comparisonResult == 0) {
+				from = centre;
+				to = centre;
+				break;
+			}
+			else if (comparisonResult > 0) {
+				from = centre + 1;
+			}
+			else {
+				to = centre - 1;
+			}
+		}
+		/* TODO: make the behaviour greedy */
+		
+		comparisonResult = wcsncmp(s, ad->entries[from].text,
+					ad->entries[from].entryLength);
+		if (comparisonResult == 0) {
+			res[current] = from;
+			current++;
+			if (current == allocated) {
+				allocated *= 2;
+				res = realloc(res, allocated *
+						sizeof(unsigned short int));
+			}
+			s += wcslen(ad->entries[from].text);
+		}
+		else {
+			s++;
+		}
+	}
+	res[current] = L'\0';
+	
+	as = malloc(sizeof(AlphabeticString));
+	as->stringLength = current;
+	as->text = res;
+	
+	return as;
 }
 
 
@@ -299,6 +360,8 @@ bool dictMainLoop(HINSTANCE hInstance, int nCmdShow) {
 
 int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 			LPSTR lpCmdLine, int nCmdShow) {
+	alphToAString(&tmp_alphabet_data_1, L"this is a test");
+	
 	if (!dictRegisterMainWindowClass(hInstance)) {
 		return -1;
 	}

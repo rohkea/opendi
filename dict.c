@@ -2,43 +2,63 @@
 #include "alph.h"
 #define IDC_OKBUTTON 1001
 
-AlphabetEntry tmp_alphabet_entries_1[] = {
-	{1, L"a", 1},
-	{1, L"b", 2},
-	{1, L"c", 2},
-	{1, L"d", 2},
-	{1, L"e", 1},
-	{1, L"f", 2},
-	{1, L"g", 2},
-	{1, L"h", 2},
-	{1, L"i", 1},
-	{1, L"j", 2},
-	{1, L"k", 2},
-	{1, L"l", 2},
-	{1, L"m", 2},
-	{1, L"n", 2},
-	{1, L"o", 1},
-	{1, L"p", 2},
-	{1, L"q", 2},
-	{1, L"r", 2},
-	{1, L"s", 2},
-	{1, L"t", 2},
-	{1, L"u", 1},
-	{1, L"v", 2},
-	{1, L"w", 2},
-	{1, L"x", 2},
-	{1, L"y", 1},
-	{1, L"z", 2}
+/* TODO: add letters with macrons and breves */
+AlphabetEntry latin_iu_alphabet_entries[] = {
+        {1, L"A", 1},
+        {1, L"B", 2},
+        {1, L"C", 3},
+        {1, L"D", 4},
+        {1, L"E", 5},
+        {1, L"F", 6},
+        {1, L"G", 7},
+        {1, L"H", 8},
+        {1, L"I", 9},
+        {1, L"J", 9},
+        {1, L"K", 10},
+        {1, L"L", 11},
+        {1, L"M", 12},
+        {1, L"N", 13},
+        {1, L"O", 14},
+        {1, L"P", 15},
+        {1, L"Q", 16},
+        {1, L"R", 17},
+        {1, L"S", 18},
+        {1, L"T", 19},
+        {1, L"U", 20},
+        {1, L"V", 20},
+        {1, L"W", 21},
+        {1, L"X", 22},
+        {1, L"Y", 23},
+        {1, L"Z", 24},
+        {1, L"a", 1},
+        {1, L"b", 2},
+        {1, L"c", 3},
+        {1, L"d", 4},
+        {1, L"e", 5},
+        {1, L"f", 6},
+        {1, L"g", 7},
+        {1, L"h", 8},
+        {1, L"i", 9},
+        {1, L"j", 9},
+        {1, L"k", 10},
+        {1, L"l", 11},
+        {1, L"m", 12},
+        {1, L"n", 13},
+        {1, L"o", 14},
+        {1, L"p", 15},
+        {1, L"q", 16},
+        {1, L"r", 17},
+        {1, L"s", 18},
+        {1, L"t", 19},
+        {1, L"u", 20},
+        {1, L"v", 20},
+        {1, L"w", 21},
+        {1, L"x", 22},
+        {1, L"y", 23},
+        {1, L"z", 24}
 };
 
-AlphabetData tmp_alphabet_data_1 = {26, tmp_alphabet_entries_1};
-
-
-AlphabetEntry tmp_alphabet_entries_2[] = {
-	{1, L"a", 1},
-	{1, L"b", 2},
-	{1, L"c", 3}
-};
+AlphabetData latin_iu_alphabet = {26 * 2, latin_iu_alphabet_entries};
 
 AlphabeticString tmp_index_1[] = {
 	{2, (short int []){1, 2, 0}}, /* cv */
@@ -305,7 +325,7 @@ bool dictMainLoop(HINSTANCE hInstance, int nCmdShow) {
 
 int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 			LPSTR lpCmdLine, int nCmdShow) {
-	alphPrintAString(alphToAString(&tmp_alphabet_data_1, L"this is a test"));
+	alphPrintAString(alphToAString(&latin_iu_alphabet, L"this is a test"));
 	
 	if (!dictRegisterMainWindowClass(hInstance)) {
 		return -1;

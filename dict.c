@@ -119,6 +119,8 @@ LRESULT dictMainWindowCreated(HWND hwnd, CREATESTRUCT *cs) {
 	HGDIOBJ hDefaultFont;
 	int textHei, bnTextWid, bnTextHei;
 	const TCHAR *bnText = TEXT("Найти");	
+	RECT clRect;
+	int wid, hei;
 
 	DEBUG_PRINT0("Allocating ProgramData...\n");
 	pd = malloc(sizeof(ProgramData));
@@ -133,6 +135,10 @@ LRESULT dictMainWindowCreated(HWND hwnd, CREATESTRUCT *cs) {
 	pd->nOkButtonHeight = bnTextHei + 15;
 	pd->nOkButtonWidth = bnTextWid + 15;
 	
+	GetClientRect(hwnd, &clRect);
+	wid = clRect.right - clRect.left;
+	hei = clRect.bottom - clRect.top;
+	
 	hDefaultFont = GetStockObject(DEFAULT_GUI_FONT);
 	pd->nTextInputHeight = textHei + 15;
 	DEBUG_PRINT0("Creating text input...\n");
@@ -140,7 +146,7 @@ LRESULT dictMainWindowCreated(HWND hwnd, CREATESTRUCT *cs) {
 		WS_EX_CLIENTEDGE, TEXT("EDIT"), TEXT("Привет! Это проверка"),
 		WS_CHILD|WS_VISIBLE,
 		0, 0,
-		cs->cx - pd->nOkButtonWidth, pd->nTextInputHeight,
+		wid - pd->nOkButtonWidth, pd->nTextInputHeight,
 		hwnd, NULL, cs->hInstance, 0
 	);
 	
@@ -157,7 +163,7 @@ LRESULT dictMainWindowCreated(HWND hwnd, CREATESTRUCT *cs) {
 	pd->hOkButton = CreateWindowEx(
 		WS_EX_CLIENTEDGE, TEXT("BUTTON"), bnText,
 		WS_CHILD | WS_VISIBLE | BS_DEFPUSHBUTTON,
-		cs->cx - pd->nOkButtonWidth, 0,
+		wid - pd->nOkButtonWidth, 0,
 		pd->nOkButtonWidth, pd->nOkButtonHeight,
 		hwnd, NULL, cs->hInstance, NULL
 	);
@@ -167,9 +173,9 @@ LRESULT dictMainWindowCreated(HWND hwnd, CREATESTRUCT *cs) {
 	
 	pd->hDictList = CreateWindowEx(
 		WS_EX_CLIENTEDGE, TEXT("LISTBOX"), NULL,
-		WS_CHILD | WS_VISIBLE | WS_VSCROLL,
+		WS_CHILD | WS_VISIBLE | WS_VSCROLL | LBS_NOINTEGRALHEIGHT,
 		0, pd->nTextInputHeight,
-		cs->cx, cs->cy - pd->nTextInputHeight,
+		wid, hei - pd->nTextInputHeight,
 		hwnd, NULL, cs->hInstance, 0
 	);
 	
@@ -208,6 +214,8 @@ void dictMainWindowResized(HWND hwnd, int width, int height) {
 			0, pd->nTextInputHeight,
 			width, height - pd->nTextInputHeight,
 			true);
+	
+	InvalidateRect(hwnd, NULL, false);
 }
 
 LRESULT CALLBACK MainWindowWndProc(HWND hwnd, UINT msg,

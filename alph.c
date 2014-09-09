@@ -38,7 +38,7 @@ AlphabeticString *alphToAString(AlphabetData *ad, wchar_t *s) {
 				from = centre + 1;
 			}
 			else {
-				to = centre - 1;
+				to = centre;
 			}
 		}
 		/* TODO: make the behaviour greedy */
@@ -46,7 +46,7 @@ AlphabeticString *alphToAString(AlphabetData *ad, wchar_t *s) {
 		comparisonResult = wcsncmp(s, ad->entries[from].text,
 					ad->entries[from].entryLength);
 		if (comparisonResult == 0) {
-			res[current] = from;
+			res[current] = ad->entries[from].code;
 			current++;
 			if (current == allocated) {
 				allocated *= 2;
@@ -56,6 +56,7 @@ AlphabeticString *alphToAString(AlphabetData *ad, wchar_t *s) {
 			s += wcslen(ad->entries[from].text);
 		}
 		else {
+			printf("Skipping %c\n", *s);
 			s++;
 		}
 	}
@@ -66,4 +67,14 @@ AlphabeticString *alphToAString(AlphabetData *ad, wchar_t *s) {
 	as->text = res;
 	
 	return as;
+}
+
+/* For debugging */
+void alphPrintAString(AlphabeticString *a) {
+	int i;
+	
+	for (i = 0; i <= a->stringLength; i++) {
+		printf("%d ", a->text[i]);
+	}
+	puts("\n");
 }

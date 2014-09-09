@@ -22,7 +22,7 @@ AlphabetEntry tmp_alphabet_entries_1[] = {
 	{1, L"q", 2},
 	{1, L"r", 2},
 	{1, L"s", 2},
-	{1, L"ß", 2},
+	{1, L"t", 2},
 	{1, L"u", 1},
 	{1, L"v", 2},
 	{1, L"w", 2},
@@ -292,11 +292,12 @@ bool dictMainLoop(HINSTANCE hInstance, int nCmdShow) {
 	}
 
 	return true;
-} 
+}
+
 
 int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 			LPSTR lpCmdLine, int nCmdShow) {
-	alphToAString(&tmp_alphabet_data_1, L"this is a test");
+	alphPrintAString(alphToAString(&tmp_alphabet_data_1, L"this is a test"));
 	
 	if (!dictRegisterMainWindowClass(hInstance)) {
 		return -1;

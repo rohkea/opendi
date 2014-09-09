@@ -69,6 +69,33 @@ AlphabeticString *alphToAString(AlphabetData *ad, wchar_t *s) {
 	return as;
 }
 
+int alphCompare(AlphabeticString *s1, AlphabeticString *s2) {
+	int i;
+	unsigned short int *t1, *t2;
+	
+	t1 = s1->text;
+	t2 = s2->text;
+	do {
+		if (*t1 != *t2) {
+			return *t1 - *t2;
+		}
+		else {
+			t1++;
+			t2++;
+		}
+	} while (*t1 && *t2);
+	
+	if (*t1 != 0) {
+		return 0x7FFF;
+	}
+	
+	if (*t2 != 0) {
+		return -0x8000;
+	}
+	
+	return 0;
+}
+
 /* For debugging */
 void alphPrintAString(AlphabeticString *a) {
 	int i;

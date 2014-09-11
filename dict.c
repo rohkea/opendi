@@ -68,31 +68,87 @@ AlphabeticString tmp_index_1[] = {
 };
 
 AlphabeticString tmp_index_2[] = {
-	{1, (short int []){1, 0}}, /* a */
-	{2, (short int []){1, 3, 0}}, /* ac */
-	{2, (short int []){2, 1, 0}}, /* ba */
-	{3, (short int []){2, 2, 3, 0}}, /* bbc */
-	{2, (short int []){3, 1, 0}}, /* ca */
-	{2, (short int []){3, 3, 0}} /* cc */
+	{7, (short int []){1, 6, 6, 11, 9, 7, 14, 0}}, /* affligo 100 */
+	{9, (short int []){1, 18, 3, 11, 5, 15, 9, 1, 18, 0}}, /* asclepias 200 */
+	{9, (short int []){3, 1, 18, 9, 7, 13, 5, 19, 5, 0}}, /* casignete 300 */
+	{10, (short int []){3, 14, 12, 15, 14, 18, 9, 19, 20, 18, 0}}, /* compositus 400 */
+	{9, (short int []){3, 23, 11, 11, 5, 13, 9, 20, 18, 0}}, /* Cyllenius 500 */
+	{8, (short int []){4, 20, 12, 19, 1, 22, 1, 19, 0}} /* dumtaxat 600 */
 };
 
 DictionaryData tmp_dicts[] = {
-	{L"Test1", L"Latin", 10, 4, tmp_index_1},
-	{L"Test2", L"Latin", 3, 6, tmp_index_2}
+	{L"Test1", L"latin", &latin_iu_alphabet, 10, 4, tmp_index_1},
+	{L"Test2", L"latin-iu", &latin_iu_alphabet, 3, 6, tmp_index_2}
 };
 
 const TCHAR className[] = TEXT("Thesaurorum verborum...");
 
+void dictSearchWord(const DictionaryData *dict, const wchar_t *word) {
+	AlphabeticString *aword;
+	int from, to, centre, comparisonResult;
+	int page;
+	
+	DEBUG_PRINT0("Converting word to astring\n");
+	aword = alphToAString(dict->alphabet, word);
+	
+	DEBUG_PRINT0("Searching for the word in the dictionary\n");
+	from = 0;
+	to = dict->numEntries;
+	while (from < to - 1) {
+		centre = (from + to) / 2;
+		comparisonResult = alphCompare(aword,
+				&dict->entries[centre]);
+		if (comparisonResult == 0) {
+			from = centre;
+			to = centre;
+			break;
+		}
+		else if (comparisonResult > 0) {
+			from = centre + 1;
+		}
+		else {
+			to = centre;
+		}
+	}
+	
+	DEBUG_PRINT0("Searching finished\n");
+	comparisonResult = alphCompare(aword,
+			&dict->entries[from]);
+	if (comparisonResult <= 0) {
+		page = from;
+	}
+	else if (comparisonResult > 0) {
+		page = from + 1;
+	}
 
+	alphFreeAString(aword);
+	
+	
+	printf("Move to page %d\n", page);
+}
 
-
-void dictSearchWord(HWND hwnd) {
+void dictOkButtonClicked(HWND hwnd) {
 	TCHAR text[512];
 	ProgramData *pd;
+	int dictIndex;
+	DictionaryData *dict;
 
 	pd = (ProgramData *)GetWindowLong(hwnd, 0);
 	GetWindowText(pd->hTextInput, text, 512);
-	MessageBox(0, text, TEXT("Поиск"), MB_OK);
+	/* TODO: convert to Unicode if using Win9x */
+	/* TODO: allow choosing dictionary in text field */
+	
+	dictIndex = SendMessage(pd->hDictList, LB_GETCURSEL, 0, 0);
+	assert(dictIndex < pd->numDicts);
+	if (dictIndex >= 0) {
+		dict = &pd->dicts[dictIndex];
+		dictSearchWord(dict, &text);
+	}
+	else {
+		MessageBox(hwnd, TEXT("Пожалуйста, выберите словарь!"),
+				TEXT("Ошибка"), MB_OK | MB_ICONEXCLAMATION);
+	}
+	
 }
 
 void dictSetDictionaries(HWND hwnd, int nDicts, DictionaryData *dd) {
@@ -125,7 +181,7 @@ LRESULT CALLBACK dictTextInputProc(HWND hwnd, UINT msg, WPARAM wParam,
 	case WM_KEYDOWN:
 		switch (wParam) {
 		case VK_RETURN:
-			dictSearchWord(hParentWindow);
+			dictOkButtonClicked(hParentWindow);
 			break;
 		}
 		break;
@@ -255,7 +311,7 @@ LRESULT CALLBACK MainWindowWndProc(HWND hwnd, UINT msg,
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case IDC_OKBUTTON:
-			dictSearchWord(hwnd);
+			dictOkButtonClicked(hwnd);
 			break;
 		}
 		break;
@@ -325,7 +381,6 @@ bool dictMainLoop(HINSTANCE hInstance, int nCmdShow) {
 
 int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 			LPSTR lpCmdLine, int nCmdShow) {
-	alphPrintAString(alphToAString(&latin_iu_alphabet, L"this is a test"));
 	
 	if (!dictRegisterMainWindowClass(hInstance)) {
 		return -1;

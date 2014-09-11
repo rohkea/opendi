@@ -1,4 +1,4 @@
 void alphFreeAString(AlphabeticString *s);
-AlphabeticString *alphToAString(AlphabetData *ad, wchar_t *s);
-int alphCompare(AlphabeticString *s1, AlphabeticString *s2);
-void alphPrintAString(AlphabeticString *a);
+AlphabeticString *alphToAString(const AlphabetData *ad, const wchar_t *s);
+int alphCompare(const AlphabeticString *s1, const AlphabeticString *s2);
+void alphPrintAString(const AlphabeticString *a);

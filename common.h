@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <assert.h>
 #include <tchar.h>
 #include "windows.h"
 
@@ -35,6 +36,7 @@ typedef struct _AlphabeticString {
 typedef struct _DictionaryData {
 	TCHAR *name;
 	wchar_t *alphabetName;
+	AlphabetData *alphabet;
 	int startsFrom;
 	int numEntries;
 	AlphabeticString *entries;

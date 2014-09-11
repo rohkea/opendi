@@ -11,7 +11,7 @@ void alphFreeAString(AlphabeticString *s) {
 }
 
 /* returned string should be freed with alphFreeAString */
-AlphabeticString *alphToAString(AlphabetData *ad, wchar_t *s) {
+AlphabeticString *alphToAString(const AlphabetData *ad, const wchar_t *s) {
 	unsigned short int *res;
 	AlphabeticString *as;
 	int allocated, current;
@@ -69,7 +69,7 @@ AlphabeticString *alphToAString(AlphabetData *ad, wchar_t *s) {
 	return as;
 }
 
-int alphCompare(AlphabeticString *s1, AlphabeticString *s2) {
+int alphCompare(const AlphabeticString *s1, const AlphabeticString *s2) {
 	int i;
 	unsigned short int *t1, *t2;
 	
@@ -97,7 +97,7 @@ int alphCompare(AlphabeticString *s1, AlphabeticString *s2) {
 }
 
 /* For debugging */
-void alphPrintAString(AlphabeticString *a) {
+void alphPrintAString(const AlphabeticString *a) {
 	int i;
 	
 	for (i = 0; i <= a->stringLength; i++) {

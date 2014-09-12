@@ -1,6 +1,7 @@
 #include "common.h"
 #include "alph.h"
 #define IDC_OKBUTTON 1001
+#define MAX_DICTFILE_SIZE 1024 * 1024
 
 /* TODO: add letters with macrons and breves */
 AlphabetEntry latin_iu_alphabet_entries[] = {
@@ -82,6 +83,41 @@ DictionaryData tmp_dicts[] = {
 };
 
 const TCHAR className[] = TEXT("Thesaurorum verborum...");
+
+void idxFreeDict(DictionaryData *dict) {
+	if (dict != NULL) {
+		if (dict->entries != NULL) {
+			free(dict->entries);
+		}
+		free(dict);
+	}
+}
+
+DictionaryData *idxLoadDict(TCHAR *filename) {
+	HANDLE hFile;
+	DWORD fileSize, fileSizeHi, read;
+	char *buffer;
+	
+	hFile = CreateFile(filename, GENERIC_READ,
+		FILE_SHARE_READ, NULL, OPEN_EXISTING,
+		FILE_FLAG_SEQUENTIAL_SCAN, 0);
+	fileSize = GetFileSize(hFile, &fileSizeHi);
+	
+	if (fileSizeHi != 0 || fileSize > MAX_DICTFILE_SIZE) {
+		CloseHandle(hFile);
+		return NULL;
+	}
+	
+	buffer = malloc(fileSize);
+	if(!ReadFile(hFile, buffer, fileSize, &read, NULL)) {
+		CloseHandle(hFile);
+		return NULL;
+	}
+	
+	CloseHandle(hFile);
+	
+	/* TODO: finish this */
+}
 
 void dictSearchWord(const DictionaryData *dict, const wchar_t *word) {
 	AlphabeticString *aword;

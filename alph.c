@@ -56,7 +56,6 @@ AlphabeticString *alphToAString(const AlphabetData *ad, const wchar_t *s) {
 			s += wcslen(ad->entries[from].text);
 		}
 		else {
-			printf("Skipping %c\n", *s);
 			s++;
 		}
 	}

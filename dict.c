@@ -93,10 +93,43 @@ void idxFreeDict(DictionaryData *dict) {
 	}
 }
 
+typedef struct _IndexReaderData {
+	unsigned char *buffer;
+	int fileSize;
+	int currentPosition;
+	char *indexSeparator;
+} IndexReaderData;
+
+bool idxIsIndexStart(IndexReaderData *ird) {
+
+}
+
+bool idxParseLine(IndexReaderData *ird) {
+	int i;
+	
+	i = ird->currentPosition;
+}
+
+bool idxSkipBom(IndexReaderData *ird) {
+	const char bom[] = {0xEF, 0xBB, 0xBF};
+	
+	if (ird->currentPosition + 3 < ird->fileSize
+			&& strncmp(&ird->buffer[ird->currentPosition],
+						bom, 3) == 0) {
+		DEBUG_PRINT0("UTF-8 \"BOM\" skipped\n");
+		ird->currentPosition += 3;
+		return true;
+	}
+	else {
+		DEBUG_PRINT0("The file has no UTF-8 \"BOM\"\n");
+		return false;
+	}
+}
+
 DictionaryData *idxLoadDict(TCHAR *filename) {
 	HANDLE hFile;
 	DWORD fileSize, fileSizeHi, read;
-	char *buffer;
+	IndexReaderData ird;
 	
 	hFile = CreateFile(filename, GENERIC_READ,
 		FILE_SHARE_READ, NULL, OPEN_EXISTING,
@@ -108,15 +141,22 @@ DictionaryData *idxLoadDict(TCHAR *filename) {
 		return NULL;
 	}
 	
-	buffer = malloc(fileSize);
-	if(!ReadFile(hFile, buffer, fileSize, &read, NULL)) {
+	ird.fileSize = fileSize;
+	ird.buffer = malloc(fileSize);
+	if(!ReadFile(hFile, ird.buffer, fileSize, &read, NULL)) {
 		CloseHandle(hFile);
 		return NULL;
 	}
 	
 	CloseHandle(hFile);
 	
+	ird.currentPosition = 0;
+	idxSkipBom(&ird);
+	
 	/* TODO: finish this */
+	
+	free(ird.buffer);
+	return NULL;
 }
 
 void dictSearchWord(const DictionaryData *dict, const wchar_t *word) {
@@ -178,7 +218,8 @@ void dictOkButtonClicked(HWND hwnd) {
 	assert(dictIndex < pd->numDicts);
 	if (dictIndex >= 0) {
 		dict = &pd->dicts[dictIndex];
-		dictSearchWord(dict, &text);
+		/* TODO: fix for Win9x */
+		dictSearchWord(dict, (wchar_t *)&text);
 	}
 	else {
 		MessageBox(hwnd, TEXT("Пожалуйста, выберите словарь!"),
@@ -417,6 +458,9 @@ bool dictMainLoop(HINSTANCE hInstance, int nCmdShow) {
 
 int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 			LPSTR lpCmdLine, int nCmdShow) {
+	
+	/* For testing only */
+	idxLoadDict(TEXT("C:\\test.scdict"));
 	
 	if (!dictRegisterMainWindowClass(hInstance)) {
 		return -1;

@@ -110,22 +110,6 @@ bool idxParseLine(IndexReaderData *ird) {
 	i = ird->currentPosition;
 }
 
-bool idxSkipBom(IndexReaderData *ird) {
-	const char bom[] = {0xEF, 0xBB, 0xBF};
-	
-	if (ird->currentPosition + 3 < ird->fileSize
-			&& strncmp(&ird->buffer[ird->currentPosition],
-						bom, 3) == 0) {
-		DEBUG_PRINT0("UTF-8 \"BOM\" skipped\n");
-		ird->currentPosition += 3;
-		return true;
-	}
-	else {
-		DEBUG_PRINT0("The file has no UTF-8 \"BOM\"\n");
-		return false;
-	}
-}
-
 DictionaryData *idxLoadDict(TCHAR *filename) {
 	HANDLE hFile;
 	DWORD fileSize, fileSizeHi, read;
@@ -151,7 +135,6 @@ DictionaryData *idxLoadDict(TCHAR *filename) {
 	CloseHandle(hFile);
 	
 	ird.currentPosition = 0;
-	idxSkipBom(&ird);
 	
 	/* TODO: finish this */
 	

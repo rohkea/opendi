@@ -3,6 +3,7 @@
 #define IDC_OKBUTTON 1001
 #define MAX_DICTFILE_SIZE 1024 * 1024
 #define MAX_PROP_NAME_SIZE 512
+#define MAX_PROP_VALUE_SIZE 512
 
 /* TODO: add letters with macrons and breves */
 AlphabetEntry latin_iu_alphabet_entries[] = {
@@ -129,8 +130,6 @@ char *idxReadPropName(IndexReaderData *ird) {
 			i < MAX_PROP_NAME_SIZE - 1 &&
 			!isspace(ird->buffer[ird->currentPosition + i])) {
 	
-	printf("i=%d\n", i);
-		
 		currentChar = ird->buffer[ird->currentPosition + i];
 		if (currentChar == '-' || currentChar == '_') {
 			capitaliseNext = true;
@@ -145,7 +144,42 @@ char *idxReadPropName(IndexReaderData *ird) {
 	}
 	
 	ird->currentPosition += i;
-	res = malloc(i + 2);
+        word[i] = 0;
+	res = malloc(i + 1);
+	strcpy(res, word);
+	return res;
+}
+
+
+/* Returns a malloc’d string */
+char *idxReadPropValue(IndexReaderData *ird) {
+	int i;
+	char currentChar, word[MAX_PROP_VALUE_SIZE], *res;
+	
+	i = 0;
+        /* Skip spaces */
+	while (i + ird->currentPosition < ird->fileSize &&
+			i < MAX_PROP_VALUE_SIZE - 1 &&
+			isspace(ird->buffer[ird->currentPosition + i])) {
+        	i++;
+	}
+        
+	while (i + ird->currentPosition < ird->fileSize &&
+			i < MAX_PROP_VALUE_SIZE - 1 &&
+			ird->buffer[ird->currentPosition + i] != '\n') {
+	
+		
+		currentChar = ird->buffer[ird->currentPosition + i];
+		word[i] = currentChar;
+		i++;
+	}
+	
+	ird->currentPosition += i;
+	if (word[i - 1] == '\r') {
+		i--;
+	}
+	word[i] = '\r';
+	res = malloc(i + 1);
 	strcpy(res, word);
 	return res;
 }

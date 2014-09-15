@@ -15,6 +15,7 @@
 #include <stdbool.h>
 #include <assert.h>
 #include <tchar.h>
+#include <ctype.h>
 #include "windows.h"
 
 typedef struct _AlphabetEntry {

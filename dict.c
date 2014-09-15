@@ -2,6 +2,7 @@
 #include "alph.h"
 #define IDC_OKBUTTON 1001
 #define MAX_DICTFILE_SIZE 1024 * 1024
+#define MAX_PROP_NAME_SIZE 512
 
 /* TODO: add letters with macrons and breves */
 AlphabetEntry latin_iu_alphabet_entries[] = {
@@ -93,21 +94,79 @@ void idxFreeDict(DictionaryData *dict) {
 	}
 }
 
+typedef struct _IndexReaderEntry {
+	char *name;
+	int numLines;
+	char **lines;
+} IndexReaderEntry;
+
 typedef struct _IndexReaderData {
 	unsigned char *buffer;
 	int fileSize;
 	int currentPosition;
 	char *indexSeparator;
+	const char entries;
 } IndexReaderData;
 
 bool idxIsIndexStart(IndexReaderData *ird) {
+	if (strncmp(ird->indexSeparator, &ird->buffer[ird->currentPosition],
+			strlen(ird->indexSeparator)) == 0) {
+		return true;
+	}
+	else {
+		return false;
+	}
+}
 
+/* Returns a malloc’d string */
+char *idxReadPropName(IndexReaderData *ird) {
+	int i;
+	bool capitaliseNext = false;
+	char currentChar, word[MAX_PROP_NAME_SIZE], *res;
+	
+	i = 0;
+	while (i + ird->currentPosition < ird->fileSize &&
+			i < MAX_PROP_NAME_SIZE - 1 &&
+			!isspace(ird->buffer[ird->currentPosition + i])) {
+	
+	printf("i=%d\n", i);
+		
+		currentChar = ird->buffer[ird->currentPosition + i];
+		if (currentChar == '-' || currentChar == '_') {
+			capitaliseNext = true;
+		}
+		else if (capitaliseNext) {
+			word[i] = toupper(currentChar);
+		}
+		else {
+			word[i] = currentChar;
+		}
+		i++;
+	}
+	
+	ird->currentPosition += i;
+	res = malloc(i + 2);
+	strcpy(res, word);
+	return res;
 }
 
 bool idxParseLine(IndexReaderData *ird) {
 	int i;
+	char *propName, *propValue;
 	
 	i = ird->currentPosition;
+	if (isspace(ird->buffer[ird->currentPosition])) {
+		/* TODO: read next item in the last property */
+		
+	}
+	else {
+		/* TODO: read next property */
+		/* propName = idxReadPropName(ird); */
+		/* TODO: check if it’s not in use already and add/append */
+	}
+	
+	/* TODO: delete this */
+	ird->currentPosition++;
 }
 
 DictionaryData *idxLoadDict(TCHAR *filename) {
@@ -135,6 +194,18 @@ DictionaryData *idxLoadDict(TCHAR *filename) {
 	CloseHandle(hFile);
 	
 	ird.currentPosition = 0;
+	ird.indexSeparator = "===";
+	
+	while (ird.currentPosition < ird.fileSize) {
+		if (idxIsIndexStart(&ird)) {
+			/* TODO: parse index words, one per line */
+			ird.currentPosition += 1;
+		}
+		else {
+			/* TODO: do normal parsing instead */
+			idxParseLine(&ird);
+		}
+	}
 	
 	/* TODO: finish this */
 	

@@ -163,6 +163,9 @@ char *idxReadPropValue(IndexReaderData *ird) {
 			isspace(ird->buffer[ird->currentPosition + i])) {
         	i++;
 	}
+	
+	ird->currentPosition += i;
+	i = 0;
         
 	while (i + ird->currentPosition < ird->fileSize &&
 			i < MAX_PROP_VALUE_SIZE - 1 &&
@@ -178,29 +181,47 @@ char *idxReadPropValue(IndexReaderData *ird) {
 	if (word[i - 1] == '\r') {
 		i--;
 	}
-	word[i] = '\r';
+	word[i] = 0;
 	res = malloc(i + 1);
 	strcpy(res, word);
+	
+	/* Skip newline */
+	if (ird->buffer[ird->currentPosition] == '\n') {
+		ird->currentPosition++;
+	}
+	
 	return res;
+}
+
+void idxParseIndex(IndexReaderData *ird) {
+	char *line;
+	line = idxReadPropValue(ird);
+	
+	DEBUG_PRINT1("Got line \"%s\"\n", line);
 }
 
 bool idxParseLine(IndexReaderData *ird) {
 	int i;
 	char *propName, *propValue;
 	
+	DEBUG_PRINT1("Parsing line, current position is %d\n",
+			ird->currentPosition);
 	i = ird->currentPosition;
 	if (isspace(ird->buffer[ird->currentPosition])) {
 		/* TODO: read next item in the last property */
-		
+		DEBUG_PRINT0("Continuing previous property...");
+		propValue = idxReadPropValue(ird);
+		DEBUG_PRINT1("Value: %s\n", propValue);
 	}
 	else {
+		DEBUG_PRINT0("Staring a new property...\n");
 		/* TODO: read next property */
-		/* propName = idxReadPropName(ird); */
+		propName = idxReadPropName(ird);
+		DEBUG_PRINT1("Property name: %s\n", propName);
+		propValue = idxReadPropValue(ird);
+		DEBUG_PRINT1("Property value: %s\n", propValue);
 		/* TODO: check if it’s not in use already and add/append */
 	}
-	
-	/* TODO: delete this */
-	ird->currentPosition++;
 }
 
 DictionaryData *idxLoadDict(TCHAR *filename) {
@@ -233,7 +254,7 @@ DictionaryData *idxLoadDict(TCHAR *filename) {
 	while (ird.currentPosition < ird.fileSize) {
 		if (idxIsIndexStart(&ird)) {
 			/* TODO: parse index words, one per line */
-			ird.currentPosition += 1;
+			idxParseIndex(&ird);
 		}
 		else {
 			/* TODO: do normal parsing instead */

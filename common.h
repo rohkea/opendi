@@ -2,8 +2,16 @@
 
 #ifdef DEBUG
 #define DEBUG_PRINT0(x) fputs(x, stderr);
+#define DEBUG_PRINT1(x, y) fprintf(stderr, x, y);
+#define DEBUG_PRINT2(x, y, z) fprintf(stderr, x, y, z);
+#define DEBUG_PRINT3(x, y, z, u) fprintf(stderr, x, y, z, u);
+#define DEBUG_PRINT4(x, y, z, u, v) fprintf(stderr, x, y, z, u, v);
 #else
 #define DEBUG_PRINT0(x) ;
+#define DEBUG_PRINT1(x, y) ;
+#define DEBUG_PRINT2(x, y, z) ;
+#define DEBUG_PRINT3(x, y, z, u) ;
+#define DEBUG_PRINT4(x, y, z, u, v) ;
 #endif
 
 #define UNICODE

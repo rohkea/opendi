@@ -128,7 +128,7 @@ void idxAppendPropValue(IndexReaderProperty *prop, char *value) {
 	DEBUG_PRINT2("APPENDING %s += '%s'\n", prop->name, value);
 	if (prop->numValues >= prop->allocdValues) {
 		prop->allocdValues *= 2;
-		realloc(prop->values, sizeof(char *) *
+		prop->values = realloc(prop->values, sizeof(char *) *
 					prop->allocdValues);
 	}
 	prop->values[prop->numValues] = value;
@@ -145,8 +145,11 @@ void idxAppendProp(IndexReaderData *ird, char *name, char *value) {
 		/* TODO: allocate the new property */
 		if (ird->numProps >= ird->allocdProps) {
 			ird->allocdProps *= 2;
-			realloc(ird->props, sizeof(IndexReaderProperty) *
-						ird->allocdProps);
+			ird->props = realloc(
+					ird->props,
+					sizeof(IndexReaderProperty) *
+					ird->allocdProps
+			);
 		}
 		
 		idxCreateProp(&ird->props[ird->numProps], name, value);
@@ -198,12 +201,25 @@ bool idxParseLine(IndexReaderData *ird) {
 }
 
 void idxCleanIRD(IndexReaderData *ird) {
+	int i, j;
+	
 	if (ird->buffer) {
 		free(ird->buffer);
 	}
 	
 	if (ird->props) {
-		/* todo: free each property’s values */
+		for (i = 0; i < ird->numProps; i++) {
+			DEBUG_PRINT2("FREEING #%d PROP '%s'\n",
+					i, ird->props[i].name);
+			free(ird->props[i].name);
+			for (j = 0; j < ird->props[i].numValues; j++) {
+				DEBUG_PRINT1("Freeing '%s'\n", 
+						ird->props[i].values[j]);
+				free(ird->props[i].values[j]);
+			}
+			free(ird->props[i].values);
+		}
+		
 		free(ird->props);
 	}
 }

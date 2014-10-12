@@ -6,6 +6,7 @@
 /* TODO: add letters with macrons and breves */
 AlphabetEntry latin_iu_alphabet_entries[] = {
         {1, L"A", 1},
+		{2, L"A-", 101},
         {1, L"B", 2},
         {1, L"C", 3},
         {1, L"D", 4},
@@ -32,6 +33,11 @@ AlphabetEntry latin_iu_alphabet_entries[] = {
         {1, L"Y", 23},
         {1, L"Z", 24},
         {1, L"a", 1},
+		{2, L"a-", 101},
+		{3, L"a--", 102},
+		{4, L"a---", 103},
+		{5, L"a----", 104},
+		{6, L"a-----", 105},
         {1, L"b", 2},
         {1, L"c", 3},
         {1, L"d", 4},
@@ -386,6 +392,10 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	
 	/* For testing only */
 	idxLoadDict(TEXT("C:\\test.scdict"));
+	
+	/* Testing alphabets */
+	AlphabeticString *s = alphToAString(&latin_iu_alphabet, L"arbor ma-la, mala ma-la");
+	alphPrintAString(s);
 	
 	if (!dictRegisterMainWindowClass(hInstance)) {
 		return -1;
